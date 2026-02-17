@@ -2,7 +2,7 @@
   "id": "pf2e-lesser-dread-announcer",
   "title": "PF2e Lesser Dread Announcer (World)",
   "description": "All-in-one: annuncio in chat a inizio turno + installazione automatica degli Item PF2e (Effect e Aura) per Lesser Dread.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "compatibility": { "minimum": "13", "verified": "13" },
   "authors": [{ "name": "Hartman19" }],
   "esmodules": ["scripts/announcer.js"],
@@ -11,3 +11,4 @@
   "manifest": "https://raw.githubusercontent.com/SimoneManzoli/pf2e-lesser-dread-announcer/main/module.json",
   "download": "https://github.com/SimoneManzoli/pf2e-lesser-dread-announcer/archive/refs/heads/main.zip"
 }
+
