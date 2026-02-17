@@ -164,14 +164,85 @@ Hooks.once("ready", async () => {
   await upsertAuraUUID(auraItem, effectItem);
 
   // 4) Registra hook combatTurn per l'annuncio
-  if (game.pf2e?.lesserDreadHook) {
-    Hooks.off("combatTurn", game.pf2e.lesserDreadHook);
-    game.pf2e.lesserDreadHook = null;
-  }
-  game.pf2e ??= {};
-  game.pf2e.lesserDreadHook = Hooks.on("combatTurn", onTurnStartAnnounce);
+// 4) Registra hook FINE TURNO (post-update)
+if (game.pf2e?.lesserDreadHook) {
+  Hooks.off("combatTurnChange", game.pf2e.lesserDreadHook);
+  game.pf2e.lesserDreadHook = null;
+}
+game.pf2e ??= {};
 
-  console.log("PF2e Lesser Dread (all-in-one): pronto. Items world creati/aggiornati e hook registrato.");
+game.pf2e.lesserDreadHook = Hooks.on("combatTurnChange", async (combat, change, options, userId) => {
+  if (!game.user.isGM || game.user.id !== game.users.activeGM?.id) return;
+
+  const n = combat.turns?.length ?? 0;
+  if (!n) return;
+
+  // Nuovo turno corrente (post-update)
+  const newIdx = combat.turn ?? 0;
+  // Direzione: avanti (1) o indietro (-1). Se non disponibile, supponi avanti.
+  const dir = (options?.direction === -1) ? -1 : 1;
+
+  // Chi ha APPENA finito il turno?
+  const endedIdx = (dir === 1) ? (newIdx - 1 + n) % n : (newIdx + 1) % n;
+  const ended = combat.turns[endedIdx];
+  if (!ended?.tokenId) return;
+
+  const endedToken = canvas.tokens.get(ended.tokenId);
+  const endedActor = endedToken?.actor;
+  if (!endedActor) return;
+
+  // Deve avere l'effetto "effect-lesser-dread" attivo (dato dall'aura) AL termine del suo turno
+  const hasLesserDread = endedActor.itemTypes?.effect?.some(e => e.slug === "effect-lesser-dread" && !e.isExpired) ?? false;
+  if (!hasLesserDread) return;
+
+  // Dev'essere Frightened > 0
+  const fr = endedActor.getCondition?.("frightened");
+  const isFrightened = !!fr && !fr.isExpired && ((fr.value ?? 1) > 0);
+  if (!isFrightened) return;
+
+  // (Opzionale) Messaggio riassuntivo con pulsante @Check IMMUTABILE, utile per log visivo
+  const infoMsg =
+    "Frightened:Eerie symbols cover your armor, inspiring terror in your foes. " +
+    "Frightened enemies within 30 feet that can see you must attempt a " +
+    "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all|immutable:true] " + // <— DC fissa non alterata
+    "save at the end of their turn; on a failure, the value of their " +
+    "@UUID[Compendium.pf2e.conditionitems.Item.TBSHQspnbcqxsmjL]{Frightened} " +
+    "condition doesn't decrease below 1 that turn.";
+
+  await ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ token: endedToken.document }),
+    content: infoMsg
+  });
+
+  // === Tiro SALVEZZA AUTOMATICO (Volontà DC 20, tratto fear) ===
+  // Nota: in PF2e 7.x i TS sono accessibili come actor.saves.will.roll(...)
+  const rollResult = await endedActor.saves?.will?.roll?.({
+    dc: { value: 20, visible: true },
+    traits: ["fear"],                // tag "fear" utile per log/predicati
+    extraRollOptions: ["fear", "dread-rune"], // opzionale
+    test: true                       // evita dialoghi (se supportato)
+  });
+
+  // Prova a leggere il grado di successo dal risultato (fallback: nessuna azione)
+  const dos = rollResult?.degreeOfSuccess ?? rollResult?.outcome ?? null;
+
+  // Su FALLIMENTO: assicurati che la condizione non scenda sotto 1
+  if (dos === 1 || dos === "failure" || dos === "Failure") {
+    // Se a questo punto frightened è 0 (o mancante), riportalo a 1
+    const fr2 = endedActor.getCondition?.("frightened");
+    const frVal = fr2?.value ?? 0;
+    if (frVal < 1) {
+      await endedActor.increaseCondition?.("frightened", { value: 1 });
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ token: endedToken.document }),
+        content: `<em>Dread Rune:</em> il Frightened di ${endedActor.name} non scende sotto 1 questo turno (TS fallito).`
+      });
+    }
+  }
 });
+
+console.log("PF2e Lesser Dread (all-in-one): fine turno attivo (combatTurnChange).");
+});
+
 
 
