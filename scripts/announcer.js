@@ -65,7 +65,7 @@ const AURA_DATA_BASE = {
           {
             uuid: "",            // <-- lo settiamo noi dopo la creazione dell'Effect
             affects: "enemies",
-            includesSelf: true
+            includesSelf: false
           }
         ]
       }
@@ -173,3 +173,4 @@ Hooks.once("ready", async () => {
 
   console.log("PF2e Lesser Dread (all-in-one): pronto. Items world creati/aggiornati e hook registrato.");
 });
+
