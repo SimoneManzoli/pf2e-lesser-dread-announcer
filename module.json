@@ -1,17 +1,13 @@
 {
   "id": "pf2e-lesser-dread-announcer",
   "title": "PF2e Lesser Dread Announcer (World)",
-  "description": "Invia un messaggio in chat all'inizio del turno se l'attore ha l'effetto 'effect-lesser-dread' ed è Frightened (>0).",
-  "version": "1.0.0",
-  "compatibility": {
-    "minimum": "13",
-    "verified": "13"
-  },
-  "authors": [
-    { "name": "Simone" }
-  ],
+  "description": "All-in-one: annuncio in chat a inizio turno + installazione automatica degli Item PF2e (Effect e Aura) per Lesser Dread.",
+  "version": "1.1.0",
+  "compatibility": { "minimum": "13", "verified": "13" },
+  "authors": [{ "name": "Hartman19" }],
   "esmodules": ["scripts/announcer.js"],
-  "relationships": {
-    "systems": [{ "id": "pf2e", "type": "system" }]
-  }
+  "relationships": { "systems": [{ "id": "pf2e", "type": "system" }] },
+
+  "manifest": "https://raw.githubusercontent.com/SimoneManzoli/pf2e-lesser-dread-announcer/main/module.json",
+  "download": "https://github.com/SimoneManzoli/pf2e-lesser-dread-announcer/archive/refs/heads/main.zip"
 }
