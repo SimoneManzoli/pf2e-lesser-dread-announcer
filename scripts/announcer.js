@@ -15,7 +15,7 @@ const EFFECT_DATA = {
       value:
         "<p>Eerie symbols cover your armor, inspiring terror in your foes. " +
         "Frightened enemies within 30 feet that can see you must attempt a " +
-        "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all] save at the end of their turn; " +
+        "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all|immutable:true] save at the end of their turn; " +
         "on a failure, the value of their @UUID[Compendium.pf2e.conditionitems.Item.TBSHQspnbcqxsmjL]{Frightened} " +
         "condition doesn't decrease below 1 that turn.</p>",
       gm: ""
@@ -41,7 +41,7 @@ const AURA_DATA_BASE = {
         "<p>Granted by @UUID[Compendium.pf2e.equipment-srd.gSSibF07emWGpGKw]{Dread (Lesser)}</p>" +
         "<p>Eerie symbols cover your armor, inspiring terror in your foes. " +
         "Frightened enemies within 30 feet that can see you must attempt a " +
-        "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all] save at the end of their turn; " +
+        "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all|immutable:true] save at the end of their turn; " +
         "on a failure, the value of their @UUID[Compendium.pf2e.conditionitems.Item.TBSHQspnbcqxsmjL]{Frightened} " +
         "condition doesn't decrease below 1 that turn.</p>",
       gm: ""
@@ -136,7 +136,7 @@ async function onTurnStartAnnounce(combat, updateData) {
   const content =
     "Frightened:Eerie symbols cover your armor, inspiring terror in your foes. " +
     "Frightened enemies within 30 feet that can see you must attempt a " +
-    "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all] " +
+    "@Check[will|dc:20|name:Dread Rune|traits:fear|showDC:all|immutable:true] " +
     "save at the end of their turn; on a failure, the value of their " +
     "@UUID[Compendium.pf2e.conditionitems.Item.TBSHQspnbcqxsmjL]{Frightened} " +
     "condition doesn't decrease below 1 that turn.";
@@ -173,4 +173,5 @@ Hooks.once("ready", async () => {
 
   console.log("PF2e Lesser Dread (all-in-one): pronto. Items world creati/aggiornati e hook registrato.");
 });
+
 
